@@ -8,14 +8,16 @@ Prediction market positions can lock capital for weeks or months. Varla turns th
 
 > Deposit prediction market positions → borrow against them → keep your market exposure.
 
+**Current implementation:** Varla's lending infrastructure operates on Polygon using Polymarket positions as collateral. In parallel, Varla has integrated Jupiter's public Prediction Market API, introducing spot trading functionality for prediction market positions on Solana as the first step toward expanding its lending infrastructure into the Solana ecosystem.
+
 ---
 
 ## What is Varla?
 
 A trader holding a prediction market position normally has two choices:
 
-1. sell the position and lose the exposure, or  
-2. wait until the market resolves.
+1. Sell the position and lose the exposure.
+2. Wait until the market resolves.
 
 Varla introduces a third option: **use the position as collateral**.
 
@@ -33,31 +35,31 @@ Liquidity is provided by lenders through the Varla lending pool.
 ## How it works
 
 ```text
-                 ┌─────────────────────┐
-                 │       Lenders       │
-                 │  Provide liquidity  │
-                 └──────────┬──────────┘
-                            │
-                            ▼
-                    ┌───────────────┐
-                    │  Varla Pool   │
-                    └───────┬───────┘
-                            │
-                         stablecoins
-                            │
-                            ▼
+                  ┌─────────────────────┐
+                  │       Lenders       │
+                  │  Provide liquidity  │
+                  └──────────┬──────────┘
+                             │
+                             ▼
+                       ┌───────────────┐
+                       │  Varla Pool   │
+                       └───────┬───────┘
+                               │
+                           stablecoins
+                               │
+                               ▼
 ┌────────────────┐    ┌───────────────┐
-│ Prediction     │───▶│  Varla Core   │
-│ Market Shares  │    │ Cross-margin  │
+│ Prediction     │───▶│  Varla Core  │
+│ Market Shares  │    │ Cross-margin │
 └────────────────┘    └───────┬───────┘
                               │
-                    health factor / risk
+                      health factor / risk
                               │
-                ┌─────────────┴─────────────┐
-                ▼                           ▼
-        ┌──────────────┐            ┌──────────────┐
-        │ Varla Oracle │            │ Liquidations │
-        └──────────────┘            └──────────────┘
+                  ┌───────────┴───────────┐
+                  ▼                       ▼
+           ┌──────────────┐       ┌──────────────┐
+           │ Varla Oracle │       │ Liquidations │
+           └──────────────┘       └──────────────┘
 ```
 
 ### 1. Deposit
@@ -109,7 +111,7 @@ Prediction Market Position
           ↓
         Credit
           ↓
-   Additional Liquidity
+  Additional Liquidity
 ```
 
 ---
@@ -117,6 +119,8 @@ Prediction Market Position
 ## Protocol architecture
 
 Varla combines **on-chain smart contracts** with supporting **off-chain services** for market data, oracle updates, liquidations, indexing, and analytics.
+
+The existing lending protocol operates on Polygon, while the initial Solana integration introduces prediction market trading through Jupiter.
 
 ### On-chain smart contracts
 
@@ -219,11 +223,15 @@ The Varla web application provides the interface for:
 - monitoring collateral and account health;
 - managing leveraged prediction market positions.
 
+The application also integrates Jupiter's public Prediction Market API for spot trading of prediction market positions on Solana.
+
 ---
 
 ### External prediction market infrastructure
 
-Varla currently integrates directly with **Polymarket**.
+Varla currently integrates with **Polymarket** for its Polygon-based lending infrastructure and with **Jupiter** for its initial Solana prediction market trading functionality.
+
+#### Polymarket (Polygon)
 
 Polymarket provides:
 
@@ -232,7 +240,21 @@ Polymarket provides:
 - market metadata and resolution information;
 - the venue where seized collateral can be sold after liquidation.
 
-The current Varla architecture therefore combines **Varla's own lending and risk infrastructure** with Polymarket's prediction market settlement and trading infrastructure.
+The existing Varla lending architecture combines **Varla's own lending and risk infrastructure** with Polymarket's prediction market settlement and trading infrastructure.
+
+#### Jupiter Prediction Markets (Solana)
+
+Varla has integrated Jupiter's public Prediction Market API to introduce spot trading functionality for prediction market positions on Solana.
+
+The current integration supports trading prediction market positions through Jupiter, establishing an initial connection between Varla and Solana-based prediction market infrastructure.
+
+This integration is currently focused on **spot trading only**.
+
+Jupiter prediction market positions are not yet supported as collateral within Varla's lending protocol, and borrowing against these positions remains part of the Solana expansion roadmap.
+
+The objective is to progressively extend Varla's lending and risk infrastructure to Solana, enabling prediction market positions accessible through Jupiter to be used as collateral for borrowing.
+
+This represents a step toward Varla's longer-term goal of becoming a **venue-agnostic credit layer for prediction markets**.
 
 ---
 
@@ -254,6 +276,8 @@ Varla uses multiple risk controls, including:
 - a protocol reserve for bad debt.
 
 Different markets can be assigned different risk tiers depending on liquidity, maturity, and market characteristics.
+
+These mechanisms currently support Varla's Polygon-based lending infrastructure. Extending the risk model to Solana-based prediction market collateral is part of the protocol's development roadmap.
 
 ---
 
@@ -315,7 +339,7 @@ This mechanism helps protect lender liquidity from undercollateralized positions
 
 Varla is currently in **public beta**, following an initial private beta phase used to validate the protocol's core mechanics in a controlled environment, including lending and borrowing flows, collateral management, oracle updates, risk parameters, and liquidation behavior.
 
-The current implementation runs on **Polygon** and uses **Polymarket positions as collateral**.
+The current lending implementation runs on **Polygon** and uses **Polymarket positions as collateral**.
 
 The protocol currently includes:
 
@@ -331,9 +355,17 @@ The protocol currently includes:
 - liquidation automation;
 - web application.
 
+### Solana expansion
+
+Alongside the existing Polygon implementation, Varla has started expanding into the Solana ecosystem.
+
+The first integration milestone has been implemented through **Jupiter's public Prediction Market API**, introducing spot trading for prediction market positions on Solana.
+
+This integration establishes an initial foundation for working with prediction market positions on Solana, while collateralization and lending support remain in development.
+
 The public beta is focused on testing the protocol under broader real-world usage, validating the risk model and infrastructure, and gathering operational data before increasing protocol limits and expanding support to additional markets and chains.
 
-The next phase of development focuses on expanding Varla to **Solana** and evolving the protocol into a venue-agnostic lending layer for prediction market positions.
+The next phase of development focuses on bringing Varla's lending infrastructure to **Solana** and evolving the protocol into a venue-agnostic lending layer for prediction market positions.
 
 ---
 
@@ -353,8 +385,9 @@ Oracle updater, liquidation keeper,
 indexing, analytics, and backend services
 
 varla-frontend
-User-facing web application
-and protocol interaction flows
+User-facing web application,
+protocol interaction flows,
+and Jupiter trading integration
 ```
 
 Access to the private repositories can be provided to the Colosseum team if required.
@@ -392,6 +425,7 @@ Access to the private repositories can be provided to the Colosseum team if requ
 
 - Polymarket CTF
 - Polymarket CLOB
+- Jupiter Prediction Market API (Solana)
 
 ---
 
@@ -399,7 +433,9 @@ Access to the private repositories can be provided to the Colosseum team if requ
 
 Varla's development roadmap includes:
 
-- expanding Varla into a **venue-agnostic lending layer on Solana**, starting with prediction market positions accessible through **Jupiter** and tokenized **Kalshi** markets;
+- extending the existing Jupiter Prediction Market API integration beyond spot trading to support position collateralization and lending on Solana;
+- expanding Varla into a **venue-agnostic lending layer on Solana**, including support for prediction market positions accessible through Jupiter and tokenized Kalshi markets;
+- adapting the collateral valuation, cross-margin, and liquidation infrastructure for Solana-based prediction market positions;
 - improving oracle decentralization;
 - increasing liquidation infrastructure resilience;
 - introducing additional collateral risk models;
@@ -417,7 +453,10 @@ But their positions are still largely capital inefficient.
 
 Varla's goal is to build the **credit layer for prediction markets** — allowing positions to become productive collateral across on-chain finance.
 
-**Prediction markets create information assets.  
-Varla makes those assets liquid.**
+The protocol's expansion from Polygon toward Solana is part of a broader vision: making prediction market positions usable as collateral regardless of the underlying trading venue.
+
+**Prediction markets create information assets.**
+
+**Varla makes those assets liquid.**
 
 © 2026 Varla
